@@ -299,7 +299,7 @@ a:not(.btn) { color: var(--pp-primary); }
     <a class="{{ 'active' if request.path=='/employee/leave' else '' }}" href="/employee/leave"><i class="ti ti-calendar-off"></i>My Leave</a>
     <a class="{{ 'active' if request.path=='/employee/payslip_page' else '' }}" href="/employee/payslip_page"><i class="ti ti-receipt"></i>Payslips</a>
     <a class="{{ 'active' if request.path=='/employee/appraisal' else '' }}" href="/employee/appraisal"><i class="ti ti-trending-up"></i>My Appraisal</a>
-    <a class="{{ 'active' if request.path.startswith('/holidays') else '' }}" href="/holidays"><i class="ti ti-calendar-star"></i>Holidays</a>
+    <a class="{{ 'active' if request.path=='/employee/holidays' else '' }}" href="/employee/holidays"><i class="ti ti-calendar-star"></i>Holidays</a>
     <a class="{{ 'active' if request.path=='/employee/notifications' else '' }}" href="/employee/notifications"><i class="ti ti-bell"></i>Notifications</a>
     <a class="{{ 'active' if request.path=='/employee/settings' else '' }}" href="/employee/settings"><i class="ti ti-settings"></i>Settings</a>
   </nav>
@@ -1698,7 +1698,60 @@ def employee_leave():
       </table>
     </div>
     """, leave_history=leave_history, balance=leave_balance_left, by_type=by_type)
+# ---------------- EMPLOYEE: HOLIDAYS ----------------
+@app.route("/employee/holidays")
+@employee_login_required
+def employee_holidays():
+    hol = Holiday.query.order_by(Holiday.date).all()
 
+    return render_emp("""
+    <div class="pp-page-heading">
+      <div>
+        <div class="pp-eyebrow">My Workspace</div>
+        <h1 class="pp-title">
+          <i class="ti ti-calendar-star"></i> Holiday Calendar
+        </h1>
+        <div class="pp-subtitle">
+          Maharashtra public holidays — 2026
+        </div>
+      </div>
+
+      <span class="pp-badge pp-badge-purple">
+        {{ hol|length }} holiday dates
+      </span>
+    </div>
+
+    <div class="pp-card pp-card-pad">
+      <h3 class="pp-section-title mb-3">Holiday List</h3>
+
+      <div class="table-responsive">
+        <table class="table pp-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Holiday</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for h in hol %}
+            <tr>
+              <td><b>{{ h.date }}</b></td>
+              <td>{{ h.name }}</td>
+            </tr>
+
+            {% else %}
+            <tr>
+              <td colspan="2" class="text-center text-muted">
+                No holidays added yet.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    """, hol=hol)
 # ---------------- EMPLOYEE: PAYSLIP ----------------
 @app.route("/employee/payslip_page")
 @employee_login_required
